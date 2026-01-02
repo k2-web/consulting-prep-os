@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlphaOne | Advanced Due Diligence</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-layer-group"></i> AlphaOne
+            </div>
+            <div class="search-container">
+                <i class="fa-solid fa-search search-icon"></i>
+                <input type="text" id="ticker-search" placeholder="Search Ticker (e.g. MSFT)..."
+                    onkeypress="handleSearch(event)">
+            </div>
+            <div class="nav-links" id="company-list">
+                <button class="nav-item active" onclick="switchCompany('TSLA')">
+                    <span class="ticker">TSLA</span>
+                    <span class="name">Tesla Inc.</span>
+                </button>
+                <button class="nav-item" onclick="switchCompany('NVDA')">
+                    <span class="ticker">NVDA</span>
+                    <span class="name">NVIDIA Corp.</span>
+                </button>
+                <button class="nav-item" onclick="switchCompany('AAPL')">
+                    <span class="ticker">AAPL</span>
+                    <span class="name">Apple Inc.</span>
+                </button>
+            </div>
+            <div class="user-profile">
+                <div class="avatar">A</div>
+                <div class="info">
+                    <span class="role">Lead Analyst</span>
+                    <span class="status">Online</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-bar">
+                <div class="company-info">
+                    <h1 id="company-name">Tesla Inc.</h1>
+                    <div class="price-container">
+                        <h2 id="company-price">$245.00</h2>
+                        <span class="live-badge">● LIVE</span>
+                    </div>
+                    <div class="price-meta">
+                        <span id="price-change" class="positive">+1.2%</span>
+                        <span class="market-status">Market Open</span>
+                    </div>
+                </div>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+                    <button class="tab-btn" onclick="switchTab('financials')">Financials</button>
+                    <button class="tab-btn" onclick="switchTab('technicals')">Technicals</button>
+                    <button class="tab-btn" onclick="switchTab('moat')">Moat & Risks</button>
+                    <button class="tab-btn" onclick="switchTab('research')">Deep Research</button>
+                </div>
+            </header>
+
+            <!-- Content Sections -->
+            <div class="content-area">
+
+                <!-- Overview Section -->
+                <section id="overview" class="tab-content active">
+                    <div class="grid-container">
+                        <div class="card sentiment-card">
+                            <h3><i class="fa-solid fa-newspaper"></i> Market Sentiment</h3>
+                            <div class="sentiment-meter">
+                                <div class="meter-bg">
+                                    <div class="meter-fill" id="sentiment-fill"></div>
+                                </div>
+                                <span id="sentiment-label">Neutral</span>
+                            </div>
+                            <p id="sentiment-text" class="summary-text">Loading sentiment...</p>
+                        </div>
+
+                        <div class="card key-stats">
+                            <h3><i class="fa-solid fa-chart-pie"></i> Key Ratios</h3>
+                            <div class="stats-grid" id="ratios-grid">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+
+                        <div class="card price-chart-card">
+                            <h3><i class="fa-solid fa-chart-line"></i> Price Action (Last 60 Days)</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="priceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Financials Section -->
+                <section id="financials" class="tab-content">
+                    <div id="financials-container" class="grid-container" style="margin-bottom: 1.5rem;">
+                        <!-- Injected via JS -->
+                    </div>
+                    <div class="grid-container">
+                        <div class="card full-width">
+                            <h3><i class="fa-solid fa-sack-dollar"></i> Revenue vs Net Income (4 Years)</h3>
+                            <div class="chart-wrapper large">
+                                <canvas id="financialChart"></canvas>
+                            </div>
+                            <div class="analysis-text-container">
+                                <h4><i class="fa-solid fa-magnifying-glass-chart"></i> Analyst Commentary</h4>
+                                <p id="financial-analysis" class="summary-text">Loading analysis...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Technicals Section -->
+                <section id="technicals" class="tab-content">
+                    <div class="grid-container">
+                        <div class="card indicators-card">
+                            <h3><i class="fa-solid fa-sliders"></i> Technical Indicators</h3>
+                            <div class="indicators-grid" id="technicals-grid">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+                        <div class="card full-width">
+                            <h3><i class="fa-solid fa-wave-square"></i> RSI & MACD</h3>
+                            <div class="chart-wrapper medium">
+                                <canvas id="technicalChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Moat Section -->
+                <section id="moat" class="tab-content">
+                    <div class="grid-container">
+                        <div class="card moat-card">
+                            <h3><i class="fa-solid fa-shield-halved"></i> Economic Moat</h3>
+                            <div class="moat-score">
+                                <span id="moat-score">0</span>/100
+                            </div>
+                            <ul id="moat-details" class="details-list">
+                                <!-- Injected via JS -->
+                            </ul>
+                        </div>
+                        <div class="card management-card">
+                            <h3><i class="fa-solid fa-user-tie"></i> Management Quality</h3>
+                            <div class="moat-score">
+                                <span id="management-score">0</span>/100
+                            </div>
+                            <p id="management-details" class="summary-text">Loading...</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Deep Research Section -->
+                <section id="research" class="tab-content">
+                    <div class="deep-research-container">
+                        <!-- Sub Navigation -->
+                        <div class="sub-nav">
+                            <button class="sub-nav-btn active" onclick="switchResearchTab('ratios')">Ratio
+                                Analysis</button>
+                            <button class="sub-nav-btn" onclick="switchResearchTab('qualitative-deep')">Qualitative Deep
+                                Dive</button>
+                            <button class="sub-nav-btn"
+                                onclick="switchResearchTab('technicals-deep')">Technicals</button>
+                            <button class="sub-nav-btn" onclick="switchResearchTab('valuation')">Valuation</button>
+                            <button class="sub-nav-btn" onclick="switchResearchTab('news')">Dynamic News</button>
+                        </div>
+
+                        <!-- Content Containers -->
+                        <div id="ratios" class="research-sub-content active">
+                            <div class="grid-container" id="ratios-container">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+
+                        <div id="qualitative-deep" class="research-sub-content">
+                            <div class="grid-container" id="qualitative-container">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+
+                        <div id="technicals-deep" class="research-sub-content">
+                            <div class="grid-container" id="technicals-container">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+
+                        <div id="valuation" class="research-sub-content">
+                            <div class="grid-container" id="valuation-container">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+
+                        <div id="news" class="research-sub-content">
+                            <div class="grid-container" id="news-container">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Data Source -->
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <div class="loading-text">Generating Deep Research...</div>
+        <div class="loading-subtext">Est. time: <span id="loading-timer">3</span>s</div>
+    </div>
+
+    <!-- Explanation Modal -->
+    <div id="explanation-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Metric Name</h3>
+                <button class="close-modal" onclick="closeExplanation()"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-description">Description goes here...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="live_data.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

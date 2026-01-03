@@ -63,30 +63,31 @@ class SessionManager:
             "score": score
         }
         st.session_state['interview_history'].append(entry)
-        st.session_state['cases_completed'] += 1
-        st.session_state['hours_practiced'] += 0.5 # Assume 30 mins per case
         
-        # Update average score
-        current_avg = st.session_state['average_score']
-        count = st.session_state['cases_completed']
-        new_avg = ((current_avg * (count - 1)) + score) / count
-        st.session_state['average_score'] = int(new_avg)
-        
-        # Update trend
-        st.session_state['performance_trend'].append(score)
-        if len(st.session_state['performance_trend']) > 10:
-            st.session_state['performance_trend'].pop(0)
-            
+        # XP is still additive
         SessionManager.add_xp(100)
 
     @staticmethod
     def get_stats():
-        """Return user statistics."""
+        """Return user statistics calculated dynamically from history."""
+        history = st.session_state.get('interview_history', [])
+        
+        # Calculate Stats
+        cases_completed = len(history)
+        hours_practiced = cases_completed * 0.5 # Assume 30 mins per case
+        
+        if cases_completed > 0:
+            avg_score = int(sum(item['score'] for item in history) / cases_completed)
+            trend = [item['score'] for item in history][-10:] # Last 10
+        else:
+            avg_score = 0
+            trend = []
+            
         return {
             "xp": st.session_state.get('user_xp', 0),
-            "cases_completed": st.session_state.get('cases_completed', 0),
-            "hours_practiced": st.session_state.get('hours_practiced', 0),
-            "average_score": st.session_state.get('average_score', 0),
-            "trend": st.session_state.get('performance_trend', []),
+            "cases_completed": cases_completed,
+            "hours_practiced": hours_practiced,
+            "average_score": avg_score,
+            "trend": trend,
             "skills": st.session_state.get('skills', {})
         }

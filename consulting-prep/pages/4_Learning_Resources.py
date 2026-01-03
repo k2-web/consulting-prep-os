@@ -134,3 +134,39 @@ else:
                 "url": "https://www.youtube.com/watch?v=0p7gCwyd1EU",
                 "desc": "Mindset shifts for success."
             })
+
+    st.markdown("### Advanced Prep")
+    v4, v5, v6 = st.columns(3)
+    
+    with v4:
+        st.image("https://img.youtube.com/vi/f0C135xS3t4/0.jpg", use_container_width=True)
+        st.markdown("**McKinsey PEI (Behavioral)**")
+        if st.button("Watch Video", key="vid_4"):
+            view_resource({
+                "title": "McKinsey PEI Guide",
+                "type": "video",
+                "url": "https://www.youtube.com/watch?v=f0C135xS3t4",
+                "desc": "Mastering the Personal Experience Interview."
+            })
+            
+    with v5:
+        st.image("https://img.youtube.com/vi/7qR1V9j0tzM/0.jpg", use_container_width=True)
+        st.markdown("**Consulting Resume Tips**")
+        if st.button("Watch Video", key="vid_5"):
+            view_resource({
+                "title": "Consulting Resume Guide",
+                "type": "video",
+                "url": "https://www.youtube.com/watch?v=7qR1V9j0tzM",
+                "desc": "How to get the interview."
+            })
+            
+    with v6:
+        st.image("https://img.youtube.com/vi/Revk4x6tqM4/0.jpg", use_container_width=True)
+        st.markdown("**Structuring Complex Cases**")
+        if st.button("Watch Video", key="vid_6"):
+            view_resource({
+                "title": "Advanced Structuring",
+                "type": "video",
+                "url": "https://www.youtube.com/watch?v=Revk4x6tqM4",
+                "desc": "Moving beyond standard frameworks."
+            })

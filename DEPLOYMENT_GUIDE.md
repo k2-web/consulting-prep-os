@@ -55,3 +55,18 @@ Streamlit Cloud runs apps directly from a GitHub repository.
 
 * **"Module not found"**: Ensure all libraries (pandas, plotly, altair) are listed in `requirements.txt`.
 * **"File not found"**: Check your folder structure. If `Home.py` is inside a folder, you must specify that path in the deployment settings.
+
+## How to Update Your App
+
+Once deployed, your app is connected to GitHub. To make changes:
+
+1. **Edit the code** on your computer.
+2. **Push the changes** to GitHub:
+
+    ```bash
+    git add .
+    git commit -m "Description of changes"
+    git push
+    ```
+
+3. **That's it!** Streamlit Cloud will detect the new code and automatically update your live app within minutes.

@@ -179,4 +179,5 @@ else:
             """, unsafe_allow_html=True)
             
             if st.button(f"Start Case", key=f"btn_{i}", use_container_width=True):
+                st.session_state['selected_case'] = case
                 st.switch_page("pages/2_Active_Case.py")

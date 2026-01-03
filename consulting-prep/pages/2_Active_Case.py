@@ -9,16 +9,31 @@ load_css()
 SessionManager.init_session()
 
 # --- Configuration ---
+# --- Configuration ---
 STAGES = ["Introduction", "Framework", "Market Sizing", "Brainstorming", "Conclusion"]
-CASE_CONTEXT = {
-    "company": "AeroWidget Inc.",
-    "industry": "Manufacturing",
-    "problem": "Declining profits (20% drop)",
-    "goal": "Identify root cause and turnaround strategy"
-}
+
+# Load Case Context from Session State or Default
+if 'selected_case' in st.session_state:
+    selected = st.session_state['selected_case']
+    CASE_CONTEXT = {
+        "company": selected['title'],
+        "industry": selected['industry'],
+        "problem": selected['desc'],
+        "goal": "Solve the case objectives" # Generic goal if not in data, or could be added to case data
+    }
+else:
+    # Fallback / Default
+    CASE_CONTEXT = {
+        "company": "AeroWidget Inc.",
+        "industry": "Manufacturing",
+        "problem": "Declining profits (20% drop)",
+        "goal": "Identify root cause and turnaround strategy"
+    }
 
 # --- State Management ---
-if "case_state" not in st.session_state:
+# --- State Management ---
+# Check if we need to reset the state (new case selected)
+if "current_case_title" not in st.session_state or st.session_state.current_case_title != CASE_CONTEXT['company']:
     st.session_state.case_state = {
         "stage_index": 0,
         "messages": [],
@@ -28,9 +43,23 @@ if "case_state" not in st.session_state:
         "timer_remaining": 1500, # 25 mins
         "stage_complete": False # Track if user can move on
     }
+    st.session_state.current_case_title = CASE_CONTEXT['company']
+    
     # Initial Message
-    welcome_msg = f"Hello Tanvi. I'm the Case Lead. We are looking at '{CASE_CONTEXT['company']}', a widget manufacturer facing declining profits. \n\n**Objective**: {CASE_CONTEXT['goal']}.\n\nTake a moment to gather your thoughts. When ready, ask any clarifying questions."
+    welcome_msg = f"Hello Tanvi. I'm the Case Lead. We are looking at '{CASE_CONTEXT['company']}', a {CASE_CONTEXT['industry']} company. \n\n**Situation**: {CASE_CONTEXT['problem']}.\n\nTake a moment to gather your thoughts. When ready, ask any clarifying questions."
     st.session_state.case_state["messages"].append({"role": "assistant", "content": welcome_msg})
+
+if "case_state" not in st.session_state:
+    # Should be handled above, but safety fallback
+    st.session_state.case_state = {
+        "stage_index": 0,
+        "messages": [],
+        "history": [], 
+        "start_time": time.time(),
+        "timer_paused": False,
+        "timer_remaining": 1500,
+        "stage_complete": False
+    }
 
 def advance_stage():
     current_idx = st.session_state.case_state["stage_index"]

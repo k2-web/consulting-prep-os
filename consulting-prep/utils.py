@@ -130,3 +130,17 @@ def render_header():
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+def render_sidebar_footer():
+    """Renders the version tag in the sidebar."""
+    with st.sidebar:
+        st.markdown("---")
+        st.markdown(
+            """
+            <div style="text-align: center; color: #666; font-size: 12px;">
+                ConsultPrep OS v6.0<br>
+                © 2025
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )

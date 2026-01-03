@@ -19,6 +19,7 @@ if "viewing_resource" not in st.session_state:
 
 def view_resource(resource_id):
     st.session_state.viewing_resource = resource_id
+    st.rerun()
 
 def back_to_library():
     st.session_state.viewing_resource = None

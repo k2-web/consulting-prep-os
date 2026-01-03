@@ -51,16 +51,31 @@ class SessionManager:
             SessionManager.add_xp(50)
 
     @staticmethod
-    def save_interview(case_name, feedback, score=None):
+    def save_interview(case_name, feedback, score=None, breakdown=None):
         """Save an interview session result."""
-        if score is None:
-            score = random.randint(70, 95)
+        final_score = 0
+        
+        if isinstance(score, dict):
+            # Calculate weighted average if score is a breakdown
+            # Structure (30%), Analysis (40%), Communication (30%)
+            s = score.get('Structure', 0)
+            a = score.get('Analysis', 0)
+            c = score.get('Communication', 0)
+            final_score = int(s * 0.3 + a * 0.4 + c * 0.3)
+            breakdown = score
+        elif score is not None:
+            final_score = score
+            breakdown = {"Structure": score, "Analysis": score, "Communication": score}
+        else:
+            final_score = random.randint(70, 95)
+            breakdown = {"Structure": final_score, "Analysis": final_score, "Communication": final_score}
             
         entry = {
             "date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
             "case": case_name,
             "feedback": feedback,
-            "score": score
+            "score": final_score,
+            "breakdown": breakdown
         }
         st.session_state['interview_history'].append(entry)
         

@@ -14,7 +14,17 @@ def load_css():
         html, body, [class*="css"] {
             font-family: 'Inter', sans-serif;
             background-color: #13131A; /* Deepest Dark Blue/Black */
-            color: #FFFFFF;
+            color: #FFFFFF !important;
+        }
+        
+        /* Force Text Color on all common elements */
+        p, h1, h2, h3, h4, h5, h6, span, div, label, .stMarkdown, .stCaption {
+            color: #FFFFFF !important;
+        }
+        
+        /* Specific overrides for muted text if needed, but default to white for now as requested */
+        .stCaption {
+            color: #E0E0E0 !important; /* Slightly off-white for captions */
         }
         
         /* Streamlit Main Container */

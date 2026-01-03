@@ -136,8 +136,13 @@ class CaseBrain:
                 return reply
                 
             except Exception as e:
+                # Rate Limit or Auth Error
                 if "429" in str(e) or "quota" in str(e).lower():
                     return "⚠️ Free limits expired. Please try again later."
+                
+                # DEBUG: Show actual error in UI
+                st.error(f"API Connection Error: {e}")
+                
                 print(f"API Error: {e}")
                 return self._get_fallback(user_input)
         else:

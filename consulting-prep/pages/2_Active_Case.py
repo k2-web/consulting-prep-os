@@ -63,7 +63,7 @@ class CaseBrain:
     def __init__(self):
         self.api_key = None
         self.model = None
-        self.model_id = "gemini-pro" # Fallback to stable model
+        self.model_id = "gemini-2.5-flash" # Updated to available model
         self.history_buffer = [] 
         
         # Try to load API Key
@@ -75,7 +75,7 @@ class CaseBrain:
                 
             if self.api_key:
                 genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-pro')
+                self.model = genai.GenerativeModel('gemini-2.5-flash')
         except Exception as e:
             print(f"API Init Error: {e}")
             
@@ -142,12 +142,6 @@ class CaseBrain:
                 
                 # DEBUG: Show actual error in UI
                 st.error(f"API Connection Error: {e}")
-                try:
-                    # List available models to debug
-                    models = list(genai.list_models())
-                    st.write("Available models:", [m.name for m in models])
-                except Exception as debug_e:
-                    st.write(f"Could not list models: {debug_e}")
                 
                 print(f"API Error: {e}")
                 return self._get_fallback(user_input)

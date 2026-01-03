@@ -57,15 +57,14 @@ def get_stage_prompt(stage_name):
     return prompts.get(stage_name, "")
 
 # --- Gemini AI Engine ---
-from google import genai
-from google.genai import types
+import google.generativeai as genai
 
 class CaseBrain:
     def __init__(self):
         self.api_key = None
-        self.client = None
-        self.model_id = "gemini-2.5-flash"
-        self.history_buffer = [] # Keep track of conversation for context
+        self.model = None
+        self.model_id = "gemini-1.5-flash" # Fallback to 1.5 if 2.5 fails, but we try 2.5 first
+        self.history_buffer = [] 
         
         # Try to load API Key
         try:
@@ -75,7 +74,8 @@ class CaseBrain:
                 self.api_key = st.secrets["general"]["GEMINI_API_KEY"]
                 
             if self.api_key:
-                self.client = genai.Client(api_key=self.api_key)
+                genai.configure(api_key=self.api_key)
+                self.model = genai.GenerativeModel('gemini-1.5-flash')
         except Exception as e:
             print(f"API Init Error: {e}")
             
@@ -87,16 +87,15 @@ class CaseBrain:
 
     def generate_response(self, user_input, stage):
         """
-        Generates a response using Gemini 2.5 Flash.
-        Falls back to static logic if API fails or limits expired.
+        Generates a response using Gemini.
         """
-        # 1. Check for "Pass" keywords (User forcing move)
+        # 1. Check for "Pass" keywords
         if any(w in user_input.lower() for w in ["next", "move on", "proceed", "conclusion"]):
             st.session_state.case_state["stage_complete"] = True
             return "You seem ready to move on. I've enabled the 'Next Stage' button for you."
 
         # 2. API Call
-        if self.client:
+        if self.model:
             try:
                 # Construct Prompt
                 system_instruction = f"""
@@ -110,7 +109,6 @@ class CaseBrain:
                 - Do NOT give the answer away. Ask guiding questions.
                 - If they ask for data, provide it ONLY if it fits the current stage.
                 - Keep responses concise (max 3 sentences).
-                - If they say something smart, acknowledge it.
                 
                 Data Context:
                 - Revenue: Down 15% YoY.
@@ -124,30 +122,22 @@ class CaseBrain:
                 # Add user message to buffer
                 self.history_buffer.append(f"Candidate: {user_input}")
                 
-                # Create context window (last 10 turns)
+                # Create context window
                 context = "\n".join(self.history_buffer[-10:])
                 
-                response = self.client.models.generate_content(
-                    model=self.model_id,
-                    contents=f"{system_instruction}\n\nConversation History:\n{context}\n\nInterviewer Response:",
-                    config=types.GenerateContentConfig(
-                        temperature=0.7,
-                        max_output_tokens=150
-                    )
+                # Generate
+                response = self.model.generate_content(
+                    f"{system_instruction}\n\nConversation History:\n{context}\n\nInterviewer Response:"
                 )
                 
                 reply = response.text
                 self.history_buffer.append(f"Interviewer: {reply}")
                 
-                # Simple heuristic to mark stage complete if AI indicates good progress (optional, manual is safer)
-                # For now, we rely on the user or explicit keywords, or we could ask the AI to output a flag.
-                
                 return reply
                 
             except Exception as e:
-                # Rate Limit or Auth Error
                 if "429" in str(e) or "quota" in str(e).lower():
-                    return "⚠️ Free limits expired. Please try again later or check your API quota."
+                    return "⚠️ Free limits expired. Please try again later."
                 print(f"API Error: {e}")
                 return self._get_fallback(user_input)
         else:
@@ -155,7 +145,7 @@ class CaseBrain:
 
     def evaluate_performance(self):
         """Generates a final evaluation using the API."""
-        if not self.client:
+        if not self.model:
             return self.score_card
             
         try:
@@ -176,15 +166,17 @@ class CaseBrain:
             Output format: JSON with keys 'Structure', 'Analysis', 'Communication'.
             """
             
-            response = self.client.models.generate_content(
-                model=self.model_id,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json"
-                )
-            )
+            response = self.model.generate_content(prompt)
+            
+            # Try to parse JSON from text (Gemini 1.5 Flash is good at this)
             import json
-            return json.loads(response.text)
+            import re
+            text = response.text
+            # Find JSON block
+            match = re.search(r'\{.*\}', text, re.DOTALL)
+            if match:
+                return json.loads(match.group(0))
+            return self.score_card
         except Exception as e:
             print(f"Eval Error: {e}")
             return self.score_card

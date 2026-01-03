@@ -185,6 +185,14 @@ class CaseBrain:
         # Fallback to the old logic if API fails
         return "I'm having trouble connecting to the server (API Error). But let's continue. What are your thoughts on the drivers?"
 
+# Initialize Brain
+if "brain" not in st.session_state:
+    st.session_state.brain = CaseBrain()
+
+def generate_response(user_input, stage):
+    """Proxy function to call the brain."""
+    return st.session_state.brain.generate_response(user_input, stage)
+
 # --- UI Layout ---
 
 # Sidebar
